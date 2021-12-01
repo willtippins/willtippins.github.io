@@ -1,0 +1,66 @@
+@charset "utf-8";
+
+/* CUSTOM FONTS */
+@font-face {
+	font-family: "Blox";
+	src: url('/font/headerfont.ttf');
+}
+@font-face {
+    font-family: "Montserrat";
+    src: url('/font/bodyfont.ttf');
+}
+
+/* PAGE FORMATTING */
+body {
+    background-color: #e9e9e9;
+    font-family: "Montserrat";
+    font-size: 20px;
+}
+.container{
+    width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.footer{
+	margin: 0px;
+	padding: 0.25em;
+	font-family: "Montserrat";
+	font-size: 16px;
+	text-align: center;
+	clear: left;
+	bottom: 100%;
+}
+.links{
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+.content div{
+    margin-left: 4%;
+}
+a, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
+}
+a:hover{
+    text-decoration: none;
+    color: #555555;
+}
+h1{
+    font-family: "Blox";
+    font-size: 96px;
+    text-align: center;
+}
+h2{
+    font-family: "Montserrat";
+    font-size: 32px;
+}
+h3 a, h3 a:focus, h3 a:active{
+    font-family: "Montserrat";
+    font-size: 24px;
+    text-align: center;
+    color: #4777a1;
+}
+h3 a:hover{
+    color: #799ebf;
+}

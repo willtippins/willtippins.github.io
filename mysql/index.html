@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "UTF-8" />
+        <title> MySQL - SecureDB </title>
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/css/site.css" />
+        <meta name="description" content="Secure defaults for MySQL." />
+        <meta name="author" content="William Tippins" />
+    </head>
+    
+    <body>
+		<div class = "container">
+			<a href = "/"><h1> securedb </h1></a>
+            <div class = "links">
+                <h3><a href = "/mysql">MySQL &amp; MariaDB</a> &#8212; <a href="/postgresql">PostgreSQL</a> &#8212; <a href="/mongodb">MongoDB</a> </h3>
+            </div>
+			
+			<!-- PAGE CONTENT -->
+            <div class = "content">
+                <h2> MySQL &amp; MariaDB</h2>
+                    <div>
+                        <i><a href="https://espeo.eu/blog/boost-security-mysql-database/">Source: https://espeo.eu/blog/boost-security-mysql-database/</a></i><br /><br />
+                        The following default configuration settings should be changed in your installation of MySQL. Note that running the <code>mysql_secure_installation</code> command to install MySQL will configure some* of these settings for you!<br /><br />
+                        MariaDB is a fork of MySQL. These instructions may be followed to secure a MariaDB database.<br />
+                    </div><br />
+                <h2> 1) Always run database as a user. </h2> 
+                    <div>By default, MySQL has only a root user. Running the server through this root user gives the server root privileges. It is best practice to run the server through a user with the minimum necessary permissions. To this end, create a new user via the MySQL shell:</div><br />
+                    <div><code>mysql> CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';</code></div><br />
+                <h2> 2) Set unique usernames and passwords for root accounts. </h2>
+                    <div>The default installation of MySQL will have a single root user, named 'root', with no password. For obvious reasons, best practice dictates that this account is updated. This can be done via the MySQL shell as follows:</div><br />
+                    <div><code>mysql> UPDATE user set user = 'newname' WHERE user = 'root';</code></div>
+                    <div><code>mysql> ALTER USER 'newname'@'localhost' IDENTIFIED BY 'password';</code></div><br />
+                    <div>All accounts, including root accounts, should have unique usernames and passwords to make it more difficult for attackers to obtain important credentials.</div><br />
+                <h2> 3) Remove anonymous user accounts. </h2>
+                    <div>Technically, MySQL ships with one other user account: an anonymous account with no username or password. This is intended only for testing and is almost certainly unwanted in a live environment. Running the following command in MySQL shell will purge the anonymous user:</div><br />
+                    <div><code>mysql> DELETE FROM mysql.user WHERE User='';</code></div><br />
+                    <div>Updates to the grant tables will not be instantaneous on a live server. To finalize your deletion, run the following command, or else simply restart the server:</div><br />
+                    <div><code>mysql> FLUSH PRIVILEGES;</code></div>
+                <h2> 4) Don't allow users to read local files. </h2>
+                    <div>There is a command in MySQL called <code>LOAD DATA LOCAL INFILE</code> that allows a malicious user to potentially read any file on the server. By default, users have access to this command, and they shouldn't need it. You can disable the command altogether by inserting the following string into the <code>/etc/my.cnf</code> configuration file, underneath the <code>[mysqld]</code> section:</div><br />
+                    <div><code>set-variable=local-infile=0</code></div><br />
+                <h2> 5) Restrict privilege of the FILE command. </h2>
+                    <div>The <code>FILE</code> command allows privileged users to read and write files on the MySQL server. The best practice is always to restrict a command so that it can only operate on files where absolutely necessary. In the <code>/etc/my.cnf</code> configuration file, setting the <code>secure_file_priv</code> parameter to a specific directory will allow the <code>FILE</code> command to operate only in that directory.</div><br />
+                    <div><code>secure_file_priv=dir</code></div><br />
+                <h2> 6) Restrict remote access to the database. </h2>
+                    <div>For some programs, it will be necessary for users and administrators without direct access to the MySQL server to be able to access the database. There exists a blacklist and whitelist of IP addresses for such remote connections. These can be found at <code>/etc/hosts.deny</code> and <code>/etc/hosts.allow</code> respectively. For other programs, remote access will not be necessary in any case. For these instances of MySQL, the following line can safely be added to the <code>/etc/my.cnf</code> configuration file, below the section marked <code>[mysqld]</code>:</div><br />
+                    <div><code>skip-networking</code></div><br />
+                <h2> 7) Limit access to admin accounts. </h2>
+                    <div>Verify that each user with root privileges can only be accessed from the local machine. In the <code>mysql.user</code> table, only <code>localhost</code> should be listed as a host for admin accounts. This table can be easily viewed with the command:</div><br />
+                    <div><code>mysql> SELECT host, user FROM user;</code></div><br />
+                <h2> 8) Prevent attackers from seeing database names. </h2>
+                    <div>If database names are easily visible to an attacker, they are that much easier to infiltrate. Unfortunately, the <code>SHOW DATABASES</code> command is available to regular users by default. The simplest solution is to disable this functionality altogether by adding the following line to the <code>/etc/my.cnf</code> configuration file, underneath the <code>[mysqld]</code> section:</div><br />
+                    <div><code>skip-show-database</code></div><br />
+                <h2> 9) Remove the default test database. </h2>
+                    <div>There is a database called <code>test</code> added to MySQL by default that is accessible by all users. This database can and should be removed using the following command in MySQL shell:</div><br />
+                    <div><code>mysql> DROP DATABASE test;</code></div><br />
+                <h2> 10) Change the default port from 3306. </h2>
+                    <div>Using a different port will make it more difficult for attackers to target the database. The port value can be changed in the <code>my.ini</code> file on the following line:</div><br />
+                    <div><code>port=3306</code></div><br />
+                <h2> 11) Write history to /dev/null. </h2>
+                    <div>MySQL stores a plaintext history of commands run in the MySQL shell in the file <code>.mysql_history</code>. This file serves as a potential security flaw as any password changed via the shell is stored visibly in this file. The best solution is to remove the file, and output any command history to <code>/dev/null</code>. Running the following bash shell commands in the MySQL directory will accomplish this:</div><br />
+                    <div><code>$ rm ./.mysql_history<br />
+                    $ ln -s /dev/null ./.mysql_history</code></div><br /><br />
+            </div>
+			
+            <div class = "footer"> &copy; 2021 William Tippins </div>
+		</div>
+    </body>
+</html>

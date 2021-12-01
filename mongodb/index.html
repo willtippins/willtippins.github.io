@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "UTF-8" />
+        <title> MongoDB - SecureDB </title>
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/css/site.css" />
+        <meta name="description" content="Secure defaults for MongoDB." />
+        <meta name="author" content="William Tippins" />
+    </head>
+    
+    <body>
+		<div class = "container">
+			<a href = "/"><h1> securedb </h1></a>
+            <div class = "links">
+                <h3><a href = "/mysql">MySQL &amp; MariaDB</a> &#8212; <a href="/postgresql">PostgreSQL</a> &#8212; <a href="/mongodb">MongoDB</a> </h3>
+            </div>
+			
+			<!-- PAGE CONTENT -->
+            <div class = "content">
+                <h2> MongoDB </h2>
+                <div>
+                    <i><a href="https://blog.sqreen.com/top-10-security-best-practices-for-mongodb/">Source: https://blog.sqreen.com/top-10-security-best-practices-for-mongodb/</a></i><br /><br />
+                    The following default configuration settings should be changed in your installation of MongoDB. This guide is targeted toward the free version of MongoDB. Note that the enterprise edition allows for further security configuration, such as at-rest encryption.
+                </div><br />
+                <h2> 1) Create an administrative user and enable access control. </h2> 
+                    <div>MongoDB infamously does not enable access control by default. There is, however, extensive documentation on how to enable access control. This step is absolutely crucial for any program using MongoDB that is remotely public-facing as otherwise any machine can remotely connect to that program's MongoDB instance.</div><br />
+                    <div><i><a href="https://docs.mongodb.com/manual/tutorial/enable-authentication/">Documentation: https://docs.mongodb.com/manual/tutorial/enable-authentication/</a></i></div><br />
+                <h2> 2) Configure TLS/SSL. </h2>
+                    <div>MongoDB does not have Transport Layer Security (TLS) enabled by default. This means that both queries to the database and the data retrieved are sent in plaintext. Unsecured transactions like this allow for man-in-the-middle attacks and are considered bad practice, even on a completely restricted network. To enable TLS on MongoDB, a TLS solution such as OpenSSL must be installed on the system. In the <code>/etc/mongod.conf</code> configuration file, add the parameters <code>net.tls.mode</code> and <code>net.tls.certificateKeyFile</code> as follows:</div><br />
+                    <div><code>net:<br />&nbsp;&nbsp;&nbsp;tls:<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode: requireTLS<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;certificateKeyFile: /etc/ssl/mongodb.pem</code></div><br />
+                    <div>Note that <code>allowTLS</code> and <code>preferTLS</code> also work for the <code>net.tls.mode</code> parameter, but make secured transactions non-compulsory.</div><br />
+                <h2> 3) Restrict network listening to localhost. </h2>
+                    <div>Starting with MongoDB 3.6, network listening is restricted to <code>localhost</code> by default. Older versions of the software leave the network completely exposed. The following console command will bind MongoDB to localhost:</div><br />
+                    <div><code>$ mongod --bind_ip localhost</code></div><br />
+                <h2> 4) Disable Javascript execution. </h2>
+                    <div>MongoDB operations such as <code>$where</code> and <code>mapReduce</code> allow for the execution of JavaScript expressions on the server. Unless your program uses this functionality, it should be disabled to prevent SQL injection vulnerabilities. This can be done by navigating to the <code>/etc/mongod.conf</code> configuration file and adding the following line under the <code>security:</code> section:</div><br />
+                    <div><code>javascriptEnabled: false</code></div><br />
+                <h2> 5) Change the default database. </h2>
+                    <div>Whenever mongo shell is launched, a database is connected to by default, and any subsequent commands will be performed on that database. On a fresh installation of MongoDB, this database is the default <code>test</code> database. To prevent unwanted operations, the following line should be added to the <code>.mongorc.js</code> file, where <code>my_database</code> is the name of your preferred default database:</div><br />
+                    <div><code>db = db.getSiblingDB("my_database")</code></div><br />
+                    <div>This can be verified by relaunching the mongo shell and running the <code>db</code> command, which displays the current database connection.</div><br />
+                    <div><code>> db<br />my_database</code></div><br /><br />
+            </div>
+			
+            <div class = "footer"> &copy; 2021 William Tippins </div>
+		</div>
+    </body>
+</html>

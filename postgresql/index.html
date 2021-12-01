@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "UTF-8" />
+        <title> PostgreSQL - SecureDB </title>
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/css/site.css" />
+        <meta name="description" content="Secure defaults for PostgreSQL." />
+        <meta name="author" content="William Tippins" />
+    </head>
+    
+    <body>
+		<div class = "container">
+			<a href = "/"><h1> securedb </h1></a>
+            <div class = "links">
+                <h3><a href = "/mysql">MySQL &amp; MariaDB</a> &#8212; <a href="/postgresql">PostgreSQL</a> &#8212; <a href="/mongodb">MongoDB</a> </h3>
+            </div>
+			
+			<!-- PAGE CONTENT -->
+            <div class = "content">
+                <h2> PostgreSQL </h2>
+                <div>
+                    <i><a href="https://severalnines.com/database-blog/how-secure-your-postgresql-database-10-tips">Source: https://severalnines.com/database-blog/how-secure-your-postgresql-database-10-tips</a></i><br /><br />
+                    The following default configuration settings should be changed in your installation of PostgreSQL.
+                </div><br />
+                <h2> 1) Allow only the access and privileges that you need. </h2> 
+                    <div>Installing PostgreSQL will generate a file called <code>pg_hba.conf</code> which governs which IP addresses can connect to the database. Each line is an authentication rule, and PostgreSQL will <code>trust</code> or <code>reject</code> the addresses matching the given rule. This file is read top to bottom, so adding the following line to the very bottom of the file (with each value separated by &#8633; TAB indents) will disallow connections unless a defined <code>trust</code> rule is met:</div><br />
+                    <div><code>host&nbsp;&nbsp;&nbsp;all&nbsp;&nbsp;&nbsp;all&nbsp;&nbsp;&nbsp;0.0.0.0/0&nbsp;&nbsp;&nbsp;reject</code></div><br />
+                <h2> 2) Only allow necessary connections. </h2>
+                    <div>PostgreSQL listens for connections from the addresses specified in the <code>postgresql.conf</code> configuration file, by the parameter <code>listen_addresses</code>. This value should default to <code>'localhost'</code>, which is secure. If additional machines need to access the PostgreSQL database, such as other members of a cluster, insert their addresses here separated by commas. Never set <code>listen_addresses</code> to <code>'*'</code> unless you intend to allow remote connection from any machine.</div><br />
+                    <div><code>listen_addresses = 'localhost'</code></div><br />
+                <h2> 3) Change the port from the default value. </h2>
+                    <div>In the <code>postgresql.conf</code> configuration file, the default <code>port</code> parameter of <code>5432</code> should be changed to a different port. Otherwise, attackers that know the database infrastructure will know exactly which points of access to target.</div><br />
+                <h2> 4) Restrict SUPERUSER access to localhost. </h2>
+                    <div>Add the following rule near the top of the <code>pg_hba.conf</code> file to restrict access by superusers to the same machine as the PostgreSQL server. Use &#8633; TAB indents.</div><br />
+                    <div><code>host&nbsp;&nbsp;&nbsp;all&nbsp;&nbsp;&nbsp;super&nbsp;&nbsp;&nbsp;127.0.0.1/32&nbsp;&nbsp;&nbsp;trust</code></div><br />
+                <h2> 5) Require SSL for client connections. </h2>
+                    <div>PostgreSQL sends both queries and data in plaintext by default. Enabling SSL (Secure Sockets Layer) on your PostgreSQL machine secures the transaction to prevent man-in-the-middle attacks. To enable SSL in PostgreSQL, OpenSSL must be installed on the system at build time. If this is the case, the <code>ssl</code> parameter must then be enabled in the <code>postgresql.conf</code> configuration file:</div><br />
+                    <div><code>ssl=on</code></div><br />
+                    <div>PostgreSQL will now read from the system-wide configuration file for OpenSSL called <code>openssl.cnf</code>. For more information on configuring SSL and securing TCP/IP connections, see the official documentation:</div><br />
+                    <div><i><a href="https://www.postgresql.org/docs/9.1/ssl-tcp.html">https://www.postgresql.org/docs/9.1/ssl-tcp.html</a></i></div><br />
+                <h2> 6) Consider pgcrypto module to salt hashes. </h2>
+                    <div>If an attacker accesses a list of usernames and passwords in your database, they can use the credentials to target and exploit your individual users. To this end, passwords are encrypted. Encrypting passwords disguises the plaintext value as an unreadable value called a hash. This is typically done using a single key that converts each plaintext password into a hash, sort of like a cipher.</div><br />
+                    <div>Disguising passwords in this way is highly deterministic. For example, if two users have the same password, their hashed passwords will also be the same. To this end, a little bit of extra, randomly-generated data can be added to each hashed password to make the encryption harder to crack. This practice is called salting hashes. PostgreSQL does not salt hashes out of the box, but it does offer a module with this functionality called <code>pgcrypto</code>.</div><br />
+                    <div>To install this tool, use the PostgreSQL shell to connect to the database with the data you would like to encrypt. Then, create the extension.</div><br />
+                    <div><code>\c my_database;<br />
+                    CREATE EXTENSION IF NOT EXISTS "pgcrypto";</code></div><br />
+                <h2> 7) Consider pgaudit module for comprehensive logging. </h2>
+                    <div>The default logging functionality of PostgreSQL is controlled by the <code>log_statement</code> parameter in the <code>postgresql.conf</code> configuration file. Even when this parameter is set to <code>all</code>, it only lists the operations that are performed against the database. A comprehensive audit should also include the changes made to the database during each session. A module called <code>pgaudit</code> offers this functionality. To install the module on a Linux machine, follow the instructions on its GitHub page:</div><br />
+                    <div><i><a href="https://github.com/pgaudit/pgaudit#compile-and-install">https://github.com/pgaudit/pgaudit#compile-and-install</a></i></div><br /><br />
+            </div>
+			
+            <div class = "footer"> &copy; 2021 William Tippins </div>
+		</div>
+    </body>
+</html>
